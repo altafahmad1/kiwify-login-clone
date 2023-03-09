@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PrimaryButton } from '../../components/Button';
 import { Input } from '../../components/Input';
 import CheckBox from '../../components/Input/CheckBox';
@@ -8,6 +8,78 @@ export default function SignupPage() {
 	useEffect(() => {
 		document.title = 'Cadastro';
 	}, []);
+
+	const [emailError, setEmailError] = useState(null);
+	const [repeatEmailError, setRepeatEmailError] = useState(null);
+	const [passwordError, setPasswordError] = useState(null);
+	const [checkboxError, setCheckboxError] = useState(null);
+
+	const emailRef = useRef();
+	const repeatEmailRef = useRef();
+	const passwordRef = useRef();
+	const checkboxRef = useRef();
+
+	const validateEmail = () => {
+		if (
+			!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
+				emailRef.current.value
+			) ||
+			emailRef.current.value === ''
+		) {
+			if (emailRef.current.value === '') {
+				setEmailError('Esse campo é obrigatório');
+			} else {
+				setEmailError('O e-mail deve ser válido');
+			}
+			emailRef.current.style.borderColor = '#f44336';
+		} else {
+			console.log('HERE');
+			setEmailError(null);
+			emailRef.current.style.borderColor = '#e0e0e0';
+		}
+	};
+
+	const validateRepeatEmail = () => {
+		if (
+			repeatEmailRef.current.value === '' ||
+			repeatEmailRef.current.value !== emailRef.current.value
+		) {
+			if (
+				repeatEmailRef.current.value === '' &&
+				repeatEmailRef.current.value !== emailRef.current.value
+			) {
+				setRepeatEmailError(
+					'Os dois e-mails devem ser iguais.\nEsse campo é obrigatório'
+				);
+			} else {
+				setRepeatEmailError('Esse campo é obrigatório');
+			}
+			repeatEmailRef.current.style.borderColor = '#f44336';
+		} else {
+			setRepeatEmailError(null);
+			repeatEmailRef.current.style.borderColor = '#e0e0e0';
+		}
+	};
+
+	const validatePassword = () => {
+		if (passwordRef.current.value === '') {
+			setPasswordError('Esse campo é obrigatório');
+			passwordRef.current.style.borderColor = '#f44336';
+		} else {
+			setPasswordError(null);
+			passwordRef.current.style.borderColor = '#e0e0e0';
+		}
+	};
+
+	const validateCheckbox = () => {
+		if (!checkboxRef.current.checked) {
+			setCheckboxError('(Esse campo é obrigatório)');
+			checkboxRef.current.style.borderColor = '#f44336';
+		} else {
+			setCheckboxError(null);
+			checkboxRef.current.style.borderColor = '#e0e0e0';
+		}
+	};
 
 	return (
 		<div className='min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8'>
@@ -33,15 +105,35 @@ export default function SignupPage() {
 				</div>
 				<div className='mt-8 sm:mx-auto sm:w-full sm:max-w-md'>
 					<form className='bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10'>
-						<Input label='E-mail' type='text' />
 						<Input
+							errorMessage={emailError}
+							onBlur={validateEmail}
+							inputRef={emailRef}
+							label='E-mail'
+							type='text'
+						/>
+						<Input
+							onBlur={validateRepeatEmail}
+							inputRef={repeatEmailRef}
+							errorMessage={repeatEmailError}
 							label='Repetir e-mail'
 							type='text'
 							containerClassName='mt-6'
 						/>
-						<Input label='Senha' containerClassName='mt-6' type='password' />
+						<Input
+							onBlur={validatePassword}
+							inputRef={passwordRef}
+							errorMessage={passwordError}
+							label='Senha'
+							containerClassName='mt-6'
+							type='password'
+						/>
 						<div className='mt-6'>
-							<CheckBox>
+							<CheckBox
+								inputRef={checkboxRef}
+								errorMessage={checkboxError}
+								onBlur={validateCheckbox}
+							>
 								Eu li e aceito os{' '}
 								<a
 									href='https://kiwify.com.br/termos-de-uso'
